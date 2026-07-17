@@ -9,7 +9,6 @@
 3. 将自定义域名绑定到您的 Worker:
    - `your-domain.com` (基础注册域名)
    - `auth-your-domain.com` (身份验证域名)
-   - `production-your-domain.com` (CDN 域名)
 
 ## Usage
 
@@ -19,7 +18,6 @@
 ```javascript
 const BASE_DOMAIN = "your-domain.com";
 const AUTH_DOMAIN = "auth-" + BASE_DOMAIN;
-const CDN_DOMAIN  = "production-" + BASE_DOMAIN;
 ```
 
 ## License

@@ -11,7 +11,6 @@ A simple hub.docker.com proxy on cloudflare worker
 3. Bind custom domains to your Worker:
    - `your-domain.com` (base registry domain)
    - `auth-your-domain.com` (authentication domain)
-   - `production-your-domain.com` (CDN domain)
 
 ## Usage
 
@@ -21,7 +20,6 @@ Configure your Docker client to use your proxy domains instead of Docker Hub dir
 ```javascript
 const BASE_DOMAIN = "your-domain.com";
 const AUTH_DOMAIN = "auth-" + BASE_DOMAIN;
-const CDN_DOMAIN  = "production-" + BASE_DOMAIN;
 ```
 
 ## License
