@@ -12,7 +12,8 @@ export default {
       const html =
         `<h1>🎉 Cloudflare Docker Proxy is Running!</h1>
          <p>Base: ${BASE_DOMAIN}</p>
-         <p>Auth: ${AUTH_DOMAIN}</p>`;
+         <p>Auth: ${AUTH_DOMAIN}</p>
+         <p><a href="https://github.com/Mxmilu666/cloudflare-dockerhub-proxy">GitHub</a></p>`;
       return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } });
     }
 
@@ -23,7 +24,30 @@ export default {
 
     if (!upstream) return new Response("Not Found", { status: 404 });
 
-    const target = new URL(upstream + url.pathname + url.search);
+    // docker pull nginx → /v2/nginx/...,官方镜像实际仓库是 library/nginx
+    let pathname = url.pathname;
+    if (url.hostname === BASE_DOMAIN) {
+      pathname = pathname.replace(
+        /^\/v2\/([^/]+)\/(manifests|blobs|tags|referrers)\//,
+        (match, name, api) =>
+          name === "library" ? match : `/v2/library/${name}/${api}/`
+      );
+    }
+
+    // token 请求的 scope 也要同步补上 library/ 前缀
+    if (url.hostname === AUTH_DOMAIN && url.searchParams.has("scope")) {
+      const scopes = url.searchParams.getAll("scope").map((scope) => {
+        const parts = scope.split(":");
+        if (parts.length === 3 && parts[0] === "repository" && !parts[1].includes("/")) {
+          parts[1] = "library/" + parts[1];
+        }
+        return parts.join(":");
+      });
+      url.searchParams.delete("scope");
+      scopes.forEach((scope) => url.searchParams.append("scope", scope));
+    }
+
+    const target = new URL(upstream + pathname + url.search);
     let response = await fetch(new Request(target, request));
 
     if (
